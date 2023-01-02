@@ -1,0 +1,9 @@
+syntax = "proto3";
+package nl.mrfriendly.exactapi;
+
+import "entity/account.proto";
+
+message ListAccountResponse {
+  int64 size = 1;
+  repeated Account accounts = 2;
+}

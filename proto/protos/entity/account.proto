@@ -1,0 +1,32 @@
+syntax = "proto3";
+package nl.mrfriendly.exactapi;
+
+message Account {
+  string id = 1;
+  string name = 2;
+  optional Address address = 3;
+  optional string kvk = 4;
+  optional string code = 5;
+  optional string email = 6;
+  optional string phone = 7;
+  optional string website = 8;
+  optional string vatNumber = 9;
+  optional AccountStatus status = 10;
+  bool isSupplier = 11;
+}
+
+message Address {
+  string line1 = 1;
+  string postcode = 2;
+  string countryCode = 3;
+  string countryName = 4;
+  string state = 5;
+  string city = 6;
+}
+
+enum AccountStatus {
+  None = 0;
+  Customer = 1;
+  Prospect = 2;
+  Suspect = 3;
+}

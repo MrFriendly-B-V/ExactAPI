@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "exactapi",
+    "proto",
+    "client_library",
+    "exact_filter",
+    "exact_requests",
+]
