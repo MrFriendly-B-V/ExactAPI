@@ -2,6 +2,8 @@ use reqwest::Client;
 
 mod error;
 mod account;
+
+pub use account::*;
 pub use error::*;
 
 #[derive(Clone)]
