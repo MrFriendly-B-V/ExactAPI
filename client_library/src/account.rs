@@ -36,6 +36,7 @@ pub enum AccountStatus {
 
 #[derive(Serialize)]
 pub struct AccountFilter {
+    id: Option<String>,
     address_line_1: Option<String>,
     city: Option<String>,
     name: Option<String>,

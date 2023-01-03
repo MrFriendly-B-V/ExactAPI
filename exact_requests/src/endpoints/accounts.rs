@@ -6,6 +6,8 @@ use crate::{Api, ExactResult};
 
 #[derive(Display, Debug)]
 pub enum AccountFilterOptions {
+    #[strum(serialize = "ID")]
+    Id,
     ChamberOfCommerce,
     Status,
     City,

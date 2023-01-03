@@ -14,6 +14,7 @@ use crate::error::WebResult;
 
 #[derive(Debug, Deserialize)]
 pub struct Query {
+    id: Option<String>,
     address_line_1: Option<String>,
     city: Option<String>,
     name: Option<String>,
@@ -34,6 +35,11 @@ pub async fn list(auth: AuthData, eauth: ExactAuthData, bearer: BearerHeader, qu
 
     if let Some(name) = &query.name {
         filter = Some(Filter::new(AccountFilterOptions::Name, &name, FilterOp::Equals));
+    }
+
+    if let Some(id) = &query.id {
+        let id_filter = Filter::new(AccountFilterOptions::Id, &id, FilterOp::Equals);
+        filter = Some(set_filter(filter, id_filter, and_mode));
     }
 
     if let Some(city) = &query.city {
