@@ -2,7 +2,7 @@ use reqwest_protobuf::{ProtobufRequestExt, ProtobufResponseExt};
 use serde::Serialize;
 use proto::ListAccountResponse;
 use crate::{ExactApiClient, ExactApiError};
-
+use derive_builder::Builder;
 
 pub struct Account {
     pub id: String,
@@ -34,7 +34,7 @@ pub enum AccountStatus {
     None,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Builder)]
 pub struct AccountFilter {
     id: Option<String>,
     address_line_1: Option<String>,
