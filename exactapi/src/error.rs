@@ -36,7 +36,9 @@ impl ResponseError for Error {
                 mrauth::Error::Reqwest(_) => StatusCode::BAD_GATEWAY,
                 mrauth::Error::UnknownToken
                 | mrauth::Error::MissingScopes => StatusCode::FORBIDDEN,
-                mrauth::Error::ProtocolError(_) | mrauth::Error::EncodeDecodeError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+                mrauth::Error::ProtocolError(_)
+                | mrauth::Error::EncodeError(_)
+                | mrauth::Error::DecodeError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             },
             Self::ExactApi(e) => match e {
                 ExactError::NotFound => StatusCode::NOT_FOUND,

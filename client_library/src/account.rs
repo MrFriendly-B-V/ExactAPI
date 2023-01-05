@@ -34,7 +34,8 @@ pub enum AccountStatus {
     None,
 }
 
-#[derive(Serialize, Builder)]
+#[derive(Serialize, Default, Builder)]
+#[builder(setter(into, strip_option), default)]
 pub struct AccountFilter {
     id: Option<String>,
     address_line_1: Option<String>,
