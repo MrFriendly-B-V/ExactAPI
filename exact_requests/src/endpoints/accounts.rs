@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use strum_macros::Display;
-use tracing::{instrument, trace};
+use tracing::{info, instrument, trace};
 use exact_filter::Filter;
 use crate::{Api, ExactResult};
 
@@ -38,15 +38,15 @@ pub struct Account {
 impl Api {
     #[instrument(skip(self))]
     pub async fn list_accounts(&self, filter: Option<Filter<AccountFilterOptions>>, division: i32) -> ExactResult<Vec<Account>> {
-
         let select = "$select=ID,AddressLine1,ChamberOfCommerce,City,Code,IsSupplier,Country,CountryName,Email,Name,Phone,Postcode,State,StateName,Status,VATNumber,Website";
         let query = match filter {
             Some(filter) => {
-                trace!("Filtering on {filter:?}");
                 format!("{select}&$filter={}", filter.finalize())
             },
             None => select.to_string()
         };
+
+        info!("{query}");
 
         #[derive(Deserialize)]
         #[serde(rename_all = "PascalCase")]

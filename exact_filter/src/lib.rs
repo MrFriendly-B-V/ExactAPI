@@ -61,7 +61,12 @@ impl<T: ToString + Debug> Filter<T> {
 
     #[inline]
     fn format_filter_string(key: T, value: &str, op: FilterOp) -> String {
-        format!("{}+{}+'{}'", key.to_string(), op.serialize(), value)
+        let key = key.to_string();
+        let value = if key.eq("ID") {
+            format!("guid'{value}'")
+        } else { format!("'{value}'") };
+
+        format!("{}+{}+{}", key, op.serialize(), value)
     }
 
     #[inline]
