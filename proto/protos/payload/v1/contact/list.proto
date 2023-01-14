@@ -1,0 +1,9 @@
+syntax = "proto3";
+package nl.mrfriendly.exactapi;
+
+import "entity/contact.proto";
+
+message ListContactResponse {
+  int64 size = 1;
+  repeated Contact contacts = 2;
+}

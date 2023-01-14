@@ -7,6 +7,9 @@ members = [
     "exact_requests",
 ]
 
+[profile.release]
+strip = true
+
 [patch.crates-io.typeshare]
 git = "ssh://git@github.com/MrFriendly-B-V/typeshare"
 branch = "support-64-typescript"

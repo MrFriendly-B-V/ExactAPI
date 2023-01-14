@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use strum_macros::Display;
-use tracing::{info, instrument, trace};
+use tracing::instrument;
 use exact_filter::Filter;
 use crate::{Api, ExactResult};
 
@@ -45,8 +45,6 @@ impl Api {
             },
             None => select.to_string()
         };
-
-        info!("{query}");
 
         #[derive(Deserialize)]
         #[serde(rename_all = "PascalCase")]

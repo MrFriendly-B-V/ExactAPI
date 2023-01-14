@@ -1,0 +1,10 @@
+syntax = "proto3";
+package nl.mrfriendly.exactapi;
+
+message Contact {
+  string id = 1;
+  string account = 2;
+  optional string email = 3;
+  optional string fullName = 4;
+  optional string phone = 5;
+}

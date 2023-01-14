@@ -9,6 +9,43 @@ pub enum FilterOp {
     NotEqual,
 }
 
+pub struct Guid(String);
+
+impl Guid {
+    #[inline]
+    fn serialize(&self) -> String {
+        format!("guid'{}'", self.0)
+    }
+
+    #[inline]
+    pub fn new<S: AsRef<str>>(guid: S) -> Self {
+        Self(guid.as_ref().to_string())
+    }
+}
+
+impl ToString for Guid {
+    fn to_string(&self) -> String {
+        self.serialize()
+    }
+}
+
+pub trait FilterValue: ToString {
+    fn serialize(&self) -> String {
+        format!("'{}'", self.to_string())
+    }
+}
+
+impl FilterValue for String {}
+impl FilterValue for Guid {
+    fn serialize(&self) -> String {
+        Guid::serialize(&self)
+    }
+}
+impl<'a> FilterValue for &'a str {}
+
+impl<'a, T: FilterValue> FilterValue for &'a T where &'a T: ToString {}
+
+
 impl FilterOp {
     #[inline]
     pub(crate) fn serialize(&self) -> &'static str {
@@ -21,24 +58,24 @@ impl FilterOp {
 
 impl<T: ToString + Debug> Filter<T> {
     #[inline]
-    pub fn new(key: T, value: &str, op: FilterOp) -> Self {
+    pub fn new(key: T, value: impl FilterValue, op: FilterOp) -> Self {
         Self(Self::format_filter_string(key, value, op), PhantomData)
     }
 
     #[inline]
-    pub fn and(mut self, key: T, value: &str, op: FilterOp) -> Self {
+    pub fn and(mut self, key: T, value: impl FilterValue, op: FilterOp) -> Self {
         self.push_operation("and", key, value, op);
         self
     }
 
     #[inline]
-    pub fn or(mut self, key: T, value: &str, op: FilterOp) -> Self {
+    pub fn or(mut self, key: T, value: impl FilterValue, op: FilterOp) -> Self {
         self.push_operation("or", key, value, op);
         self
     }
 
     #[inline]
-    fn push_operation(&mut self, name: &str, key: T, value: &str, op: FilterOp) {
+    fn push_operation(&mut self, name: &str, key: T, value: impl FilterValue, op: FilterOp) {
         self.0.push_str(&format!("+{name}+{}", Self::format_filter_string(key, value, op)));
     }
 
@@ -60,13 +97,8 @@ impl<T: ToString + Debug> Filter<T> {
     }
 
     #[inline]
-    fn format_filter_string(key: T, value: &str, op: FilterOp) -> String {
-        let key = key.to_string();
-        let value = if key.eq("ID") {
-            format!("guid'{value}'")
-        } else { format!("'{value}'") };
-
-        format!("{}+{}+{}", key, op.serialize(), value)
+    fn format_filter_string(key: T, value: impl FilterValue, op: FilterOp) -> String {
+        format!("{}+{}+{}", key.to_string(), op.serialize(), value.serialize())
     }
 
     #[inline]
@@ -83,12 +115,20 @@ impl<T: ToString + Debug> Filter<T> {
 #[cfg(test)]
 mod test {
     use strum_macros::Display;
+    use crate::Guid;
     use super::{Filter, FilterOp};
 
     #[derive(Display, Debug)]
     pub enum TestKeys {
         Foo,
         Bar
+    }
+
+    #[test]
+    fn guid() {
+        let s = Filter::new(TestKeys::Foo, Guid::new("Foo"), FilterOp::Equals)
+            .finalize();
+        assert_eq!(s, "Foo+eq+guid'Foo'");
     }
 
     #[test]

@@ -1,0 +1,15 @@
+version: '3'
+services:
+  runner:
+    container_name: exactapi
+    restart: unless-stopped
+    build:
+      context: ./
+      ssh:
+        - "default"
+
+    environment:
+      - "EXACTAUTH_HOST=https://mrf.local:8443"
+      - "MRAUTH_URL=http://localhost:3444"
+    ports:
+      - "3445:8080"

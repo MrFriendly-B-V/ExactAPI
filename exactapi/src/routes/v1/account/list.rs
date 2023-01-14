@@ -5,12 +5,13 @@ use mrauth::actix::BearerHeader;
 use mrauth::User;
 use serde::Deserialize;
 use tracing::instrument;
-use exact_filter::{Filter, FilterOp};
+use exact_filter::{Filter, FilterOp, Guid};
 use exact_requests::accounts::AccountFilterOptions;
 use exact_requests::Api;
 use proto::ListAccountResponse;
 use crate::{AuthData, ExactAuthData};
 use crate::error::WebResult;
+use crate::routes::v1::set_filter;
 
 #[derive(Debug, Deserialize)]
 pub struct Query {
@@ -24,7 +25,7 @@ pub struct Query {
     and_mode: Option<bool>
 }
 
-const SCOPE: &str = "nl.mrfriendly.exact.token nl.mrfriendly.exact.account.list";
+const SCOPE: &str = "nl.mrfriendly.exact.read nl.mrfriendly.exact";
 
 #[instrument(skip(auth, eauth, bearer))]
 pub async fn list(auth: AuthData, eauth: ExactAuthData, bearer: BearerHeader, query: web::Query<Query>) -> WebResult<Payload<ListAccountResponse>>{
@@ -38,7 +39,7 @@ pub async fn list(auth: AuthData, eauth: ExactAuthData, bearer: BearerHeader, qu
     }
 
     if let Some(id) = &query.id {
-        let id_filter = Filter::new(AccountFilterOptions::Id, &id, FilterOp::Equals);
+        let id_filter = Filter::new(AccountFilterOptions::Id, Guid::new(id), FilterOp::Equals);
         filter = Some(set_filter(filter, id_filter, and_mode));
     }
 
@@ -71,12 +72,4 @@ pub async fn list(auth: AuthData, eauth: ExactAuthData, bearer: BearerHeader, qu
         size: accounts.len() as i64,
         accounts
     }))
-}
-
-fn set_filter<T: ToString + Debug>(existing_filter: Option<Filter<T>>, new_filter: Filter<T>, and_mode: bool) -> Filter<T> {
-    match existing_filter {
-        Some(x) if and_mode => x.join_and(&new_filter),
-        Some(x) => x.join_or(&new_filter),
-        None => new_filter
-    }
 }

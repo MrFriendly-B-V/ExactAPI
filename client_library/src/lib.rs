@@ -2,9 +2,11 @@ use reqwest::Client;
 
 mod error;
 mod account;
+mod contact;
 
 pub use account::*;
 pub use error::*;
+pub use contact::*;
 
 #[derive(Clone)]
 pub struct ExactApiClient {

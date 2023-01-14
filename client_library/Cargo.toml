@@ -22,6 +22,8 @@ features = ["derive"]
 
 [dependencies.reqwest]
 version = "0.11.13"
+default-features = false
+features = ["rustls-tls"]
 
 [dependencies.proto]
 path = "../proto"
