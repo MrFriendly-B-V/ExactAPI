@@ -13,7 +13,7 @@ impl Api {
 
         let response = self.get::<Response>("/api/v1/current/Me?$select=AccountingDivision,CurrentDivision")
             .await?;
-        Ok(response.first()
+        Ok(response.results.first()
             .ok_or(ExactError::NotFound)?
             .current_division
         )

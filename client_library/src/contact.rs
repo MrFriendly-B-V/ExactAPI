@@ -10,6 +10,8 @@ pub struct Contact {
     pub full_name: Option<String>,
     pub email: Option<String>,
     pub phone: Option<String>,
+    pub last_name: Option<String>,
+    pub first_name: Option<String>,
 }
 
 #[derive(Serialize, Default, Builder)]
@@ -45,7 +47,9 @@ impl ExactApiClient {
                 account_id: x.account,
                 full_name: x.full_name,
                 email: x.email,
-                phone: x.phone
+                phone: x.phone,
+                last_name: x.last_name,
+                first_name: x.first_name,
             })
             .collect::<Vec<_>>();
         Ok(contacts)

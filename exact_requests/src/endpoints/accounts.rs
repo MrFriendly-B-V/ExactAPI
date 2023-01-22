@@ -1,6 +1,7 @@
+use async_recursion::async_recursion;
 use serde::Deserialize;
 use strum_macros::Display;
-use tracing::instrument;
+use tracing::{info, instrument};
 use exact_filter::Filter;
 use crate::{Api, ExactResult};
 
@@ -46,52 +47,65 @@ impl Api {
             None => select.to_string()
         };
 
-        #[derive(Deserialize)]
-        #[serde(rename_all = "PascalCase")]
-        struct Response {
-            #[serde(rename = "ID")]
-            id: String,
-            name: String,
-            address_line_1: Option<String>,
-            chamber_of_commerce: Option<String>,
-            city: Option<String>,
-            code: Option<String>,
-            country: Option<String>,
-            country_name: Option<String>,
-            email: Option<String>,
-            phone: Option<String>,
-            postcode: Option<String>,
-            state: Option<String>,
-            status: Option<String>,
-            #[serde(rename = "VATNumber")]
-            vat_number: Option<String>,
-            website: Option<String>,
-            is_supplier: bool,
-        }
+        let accounts = make_request(&self, &format!("/api/v1/{division}/crm/Accounts?{query}")).await?;
+        Ok(accounts)
+    }
+}
 
-        let response = self.get::<Response>(&format!("/api/v1/{division}/crm/Accounts?{query}"))
-            .await?;
+#[async_recursion]
+async fn make_request(api: &Api, url: &str) -> ExactResult<Vec<Account>> {
+    #[derive(Deserialize)]
+    #[serde(rename_all = "PascalCase")]
+    struct Response {
+        #[serde(rename = "ID")]
+        id: String,
+        name: String,
+        address_line_1: Option<String>,
+        chamber_of_commerce: Option<String>,
+        city: Option<String>,
+        code: Option<String>,
+        country: Option<String>,
+        country_name: Option<String>,
+        email: Option<String>,
+        phone: Option<String>,
+        postcode: Option<String>,
+        state: Option<String>,
+        status: Option<String>,
+        #[serde(rename = "VATNumber")]
+        vat_number: Option<String>,
+        website: Option<String>,
+        is_supplier: bool,
+    }
 
-        let accounts = response.into_iter()
-            .map(|x| Account {
-                name: x.name,
-                id: x.id,
-                address: x.address_line_1,
-                city: x.city,
-                status: x.status,
-                code: x.code,
-                postcode: x.postcode,
-                state: x.state,
-                email: x.email,
-                chamber_of_commerce: x.chamber_of_commerce,
-                vat_number: x.vat_number,
-                website: x.website,
-                country: x.country,
-                country_name: x.country_name,
-                phone: x.phone,
-                is_supplier: x.is_supplier,
-            })
-            .collect::<Vec<_>>();
+    let response = api.get::<Response>(url)
+        .await?;
+
+    let accounts = response.results.into_iter()
+        .map(|x| Account {
+            name: x.name,
+            id: x.id,
+            address: x.address_line_1,
+            city: x.city,
+            status: x.status,
+            code: x.code,
+            postcode: x.postcode,
+            state: x.state,
+            email: x.email,
+            chamber_of_commerce: x.chamber_of_commerce,
+            vat_number: x.vat_number,
+            website: x.website,
+            country: x.country,
+            country_name: x.country_name,
+            phone: x.phone,
+            is_supplier: x.is_supplier,
+        })
+        .collect::<Vec<_>>();
+
+    if let Some(next) = response.next {
+        let mut buf = accounts;
+        buf.extend(make_request(api, &next.replace("https://start.exactonline.nl", "")).await?);
+        Ok(buf)
+    } else {
         Ok(accounts)
     }
 }

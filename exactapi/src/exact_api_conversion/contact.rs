@@ -7,5 +7,7 @@ pub fn contact_to_proto(contact: Contact) -> proto::Contact {
         email: contact.email,
         full_name: contact.full_name,
         phone: contact.phone,
+        first_name: contact.first_name,
+        last_name: contact.last_name,
     }
 }

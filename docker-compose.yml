@@ -7,9 +7,10 @@ services:
       context: ./
       ssh:
         - "default"
-
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      - "EXACTAUTH_HOST=https://mrf.local:8443"
-      - "MRAUTH_URL=http://localhost:3444"
+      - "EXACTAUTH_HOST=http://host.docker.internal:8081"
+      - "MRAUTH_HOST=http://host.docker.internal:3444"
     ports:
       - "3445:8080"

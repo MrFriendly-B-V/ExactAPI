@@ -22,7 +22,7 @@ impl Api {
         }
     }
 
-    async fn get<T: DeserializeOwned>(&self, path: &str) -> ExactResult<Vec<T>> {
+    async fn get<T: DeserializeOwned>(&self, path: &str) -> ExactResult<ResponseData<T>> {
         let response = client()
             .get(get_path(path))
             .bearer_auth(&self.token)
@@ -33,7 +33,8 @@ impl Api {
         let payload: ExactResponse<T> = response
             .json()
             .await?;
-        Ok(payload.d.results)
+
+        Ok(payload.d)
     }
 
     #[allow(unused)]
@@ -104,4 +105,6 @@ pub struct ExactResponse<T> {
 #[derive(Deserialize)]
 pub struct ResponseData<T> {
     results: Vec<T>,
+    #[serde(rename = "__next")]
+    next: Option<String>,
 }

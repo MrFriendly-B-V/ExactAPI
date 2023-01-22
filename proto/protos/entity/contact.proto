@@ -7,4 +7,6 @@ message Contact {
   optional string email = 3;
   optional string fullName = 4;
   optional string phone = 5;
+  optional string firstName = 6;
+  optional string lastName = 7;
 }
