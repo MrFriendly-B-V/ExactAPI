@@ -9,6 +9,6 @@ pub fn contact_to_proto(contact: Contact) -> proto::Contact {
         phone: contact.phone,
         first_name: contact.first_name,
         last_name: contact.last_name,
-        mobile: contact.mobile,
+        mobile: contact.mobile.or(contact.business_mobile),
     }
 }

@@ -26,12 +26,13 @@ pub struct Contact {
     pub last_name: Option<String>,
     pub phone: Option<String>,
     pub mobile: Option<String>,
+    pub business_mobile: Option<String>,
 }
 
 impl Api {
     #[instrument(skip(self))]
     pub async fn list_contacts(&self, filter: Option<Filter<ContactFilterOptions>>, division: i32) -> ExactResult<Vec<Contact>> {
-        let select = "$select=ID,Account,Email,FullName,Phone,FirstName,LastName,Mobile";
+        let select = "$select=ID,Account,Email,FullName,Phone,FirstName,LastName,Mobile,BusinessMobile";
         let query = match filter {
             Some(filter) => {
                 format!("{select}&$filter={}", filter.finalize())
