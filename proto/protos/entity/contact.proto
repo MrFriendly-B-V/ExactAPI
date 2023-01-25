@@ -9,4 +9,5 @@ message Contact {
   optional string phone = 5;
   optional string firstName = 6;
   optional string lastName = 7;
+  optional string mobile = 8;
 }

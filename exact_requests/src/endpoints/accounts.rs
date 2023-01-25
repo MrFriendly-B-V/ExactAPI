@@ -1,7 +1,7 @@
 use async_recursion::async_recursion;
 use serde::Deserialize;
 use strum_macros::Display;
-use tracing::{info, instrument};
+use tracing::instrument;
 use exact_filter::Filter;
 use crate::{Api, ExactResult};
 
